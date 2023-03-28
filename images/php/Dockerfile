@@ -8,7 +8,7 @@ RUN apk update && apk add \
     vim \
     bash \
     curl \
-    zip
+    php-pgsql
 
 # Install extensions
 RUN curl -sSLf \
@@ -18,18 +18,31 @@ RUN chmod +x /usr/local/bin/install-php-extensions
 RUN install-php-extensions \
             pdo \
             pdo_pgsql \
-            xdebug \
             zip \
+            pgsql \
+            mbstring \
+            json \
+            spl \
+            gd \
+            soap \
+            xmlrpc \
+            openssl \
+            simplexml \
+            curl \
+            pcre \
+            dom \
+            xml \
+            intl \
+            exif \
+            opcache
+
+
 
 #install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Add ini-files
 COPY ./php.ini /usr/local/etc/php/conf.d/40-custom.ini
-COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
-
-# Replace env variables in xdebug.ini
-RUN sed -i 's#{{DOCKER_HOST_IP}}#'$DOCKER_HOST_IP'#g' /usr/local/etc/php/conf.d/xdebug.ini
 
 # Run composer install
 #RUN composer install
