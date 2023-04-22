@@ -28,7 +28,7 @@ services:
     networks:
       - moodle
 
-  admine:
+  adminer:
     image: adminer
     restart: unless-stopped
     container_name: adminer
