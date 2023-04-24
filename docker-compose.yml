@@ -32,6 +32,8 @@ services:
     image: adminer
     restart: unless-stopped
     container_name: adminer
+    ports:
+      - "1212:8080"
     networks:
       - moodle
 
