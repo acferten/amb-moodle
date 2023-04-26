@@ -31,9 +31,11 @@ defined('MOODLE_INTERNAL') || die();
  * @author  Alexandra Gavrilenko - based on code by Martin Dougiamas and others
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class enrol_robokassa_plugin extends enrol_plugin {
+class enrol_robokassa_plugin extends enrol_plugin
+{
 
-    public function get_currencies() {
+    public function get_currencies()
+    {
 
         $codes = array(
             'AUD', 'BRL', 'CAD', 'CHF', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HUF', 'ILS', 'INR', 'JPY',
@@ -58,7 +60,8 @@ class enrol_robokassa_plugin extends enrol_plugin {
      * @param array $instances all enrol instances of this type in one course
      * @return array of pix_icon
      */
-    public function get_info_icons(array $instances) {
+    public function get_info_icons(array $instances)
+    {
         $found = false;
         foreach ($instances as $instance) {
             if ($instance->enrolstartdate != 0 && $instance->enrolstartdate > time()) {
@@ -76,22 +79,26 @@ class enrol_robokassa_plugin extends enrol_plugin {
         return array();
     }
 
-    public function roles_protected() {
+    public function roles_protected()
+    {
         // Users with role assign cap may tweak the roles later.
         return false;
     }
 
-    public function allow_unenrol(stdClass $instance) {
+    public function allow_unenrol(stdClass $instance)
+    {
         // Users with unenrol cap may unenrol other users manually - requires enrol/robokassa:unenrol.
         return true;
     }
 
-    public function allow_manage(stdClass $instance) {
+    public function allow_manage(stdClass $instance)
+    {
         // Users with manage cap may tweak period and status - requires enrol/robokassa:manage.
         return true;
     }
 
-    public function show_enrolme_link(stdClass $instance) {
+    public function show_enrolme_link(stdClass $instance)
+    {
         return ($instance->status == ENROL_INSTANCE_ENABLED);
     }
 
@@ -100,7 +107,8 @@ class enrol_robokassa_plugin extends enrol_plugin {
      * @param int $courseid
      * @return boolean
      */
-    public function can_add_instance($courseid) {
+    public function can_add_instance($courseid)
+    {
         $context = context_course::instance($courseid, MUST_EXIST);
 
         if (!has_capability('moodle/course:enrolconfig', $context) or !has_capability('enrol/robokassa:config', $context)) {
@@ -116,7 +124,8 @@ class enrol_robokassa_plugin extends enrol_plugin {
      *
      * @return boolean
      */
-    public function use_standard_editing_ui() {
+    public function use_standard_editing_ui()
+    {
         return true;
     }
 
@@ -126,7 +135,8 @@ class enrol_robokassa_plugin extends enrol_plugin {
      * @param array $fields instance fields
      * @return int id of new instance, null if can not be created
      */
-    public function add_instance($course, array $fields = null) {
+    public function add_instance($course, array $fields = null)
+    {
         if ($fields && !empty($fields['cost'])) {
             $fields['cost'] = unformat_float($fields['cost']);
         }
@@ -139,7 +149,8 @@ class enrol_robokassa_plugin extends enrol_plugin {
      * @param stdClass $data modified instance fields
      * @return boolean
      */
-    public function update_instance($instance, $data) {
+    public function update_instance($instance, $data)
+    {
         if ($data) {
             $data->cost = unformat_float($data->cost);
         }
@@ -187,41 +198,42 @@ class enrol_robokassa_plugin extends enrol_plugin {
             $teacher = false;
         }
 
-        if ( (float) $instance->cost <= 0 ) {
+        if ((float)$instance->cost <= 0) {
             $cost = $this->get_config('cost');
         } else {
             $cost = $instance->cost;
         }
 
         if (abs($cost) < 0.01) { // No cost, other enrolment methods (instances) should be used.
-            echo '<p>'.get_string('nocost', 'enrol_robokassa').'</p>';
+            echo '<p>' . get_string('nocost', 'enrol_robokassa') . '</p>';
         } else {
-
-            $localisedcost = $cost;
-
             if (isguestuser()) { // Force login only for guest user, not real users with guest role.
                 $wwwroot = $CFG->wwwroot;
-                echo '<div class="mdl-align"><p>'.get_string('paymentrequired').'</p>';
-                echo '<p><b>'.get_string('cost').": $instance->currency $localisedcost".'</b></p>';
-                echo '<p><a href="'.$wwwroot.'/login/">'.get_string('loginsite').'</a></p>';
+                echo '<div class="mdl-align"><p>' . get_string('paymentrequired') . '</p>';
+                echo '<p><b>' . get_string('cost') . ": $instance->currency $cost" . '</b></p>';
+                echo '<p><a href="' . $wwwroot . '/login/">' . get_string('loginsite') . '</a></p>';
                 echo '</div>';
             } else {
                 // Sanitise some fields before building the robokassa form.
-                $coursefullname  = format_string($course->fullname, true, array('context' => $context));
+                $coursefullname = format_string($course->fullname, true, array('context' => $context));
                 $courseshortname = $shortname;
 
-                $instancename    = $this->get_instance_name($instance);
-                $instanceid      = $instance->id;
+                $instancename = $this->get_instance_name($instance);
+                $instanceid = $instance->id;
 
-                $merchant_login        = get_config('enrol_robokassa', 'merchant_login');
-                $password        = get_config('enrol_robokassa', 'password');
-                $invid     = 'C'.$course->id.'U'.$USER->id.'T'.time();
+                // регистрационная информация (Идентификатор магазина, пароль №1)
+                $merchant_login = get_config('enrol_robokassa', 'merchant_login');
+                $password_1 = get_config('enrol_robokassa', 'password_1');
 
-                $signature_value = md5("$merchant_login:$localisedcost:$invid:$password");
+                // номер заказа
+                $invid = (int)(((int)($course->id . $USER->id . time())) / 10000);
 
-                $returnUrl       = $CFG->wwwroot.'/enrol/robokassa/ordersuccess.php';
+                // формирование подписи
+                $signature_value =md5("$merchant_login:$cost:$invid:$password_1");
 
-                include($CFG->dirroot.'/enrol/robokassa/enrol.html');
+                $returnUrl = $CFG->wwwroot . '/enrol/robokassa/ordersuccess.php';
+
+                include($CFG->dirroot . '/enrol/robokassa/enrol.html');
             }
 
         }
@@ -237,17 +249,18 @@ class enrol_robokassa_plugin extends enrol_plugin {
      * @param stdClass $course
      * @param int $oldid
      */
-    public function restore_instance(restore_enrolments_structure_step $step, stdClass $data, $course, $oldid) {
+    public function restore_instance(restore_enrolments_structure_step $step, stdClass $data, $course, $oldid)
+    {
         global $DB;
         if ($step->get_task()->get_target() == backup::TARGET_NEW_COURSE) {
             $merge = false;
         } else {
             $merge = array(
-                'courseid'   => $data->courseid,
-                'enrol'      => $this->get_name(),
-                'roleid'     => $data->roleid,
-                'cost'       => $data->cost,
-                'currency'   => $data->currency,
+                'courseid' => $data->courseid,
+                'enrol' => $this->get_name(),
+                'roleid' => $data->roleid,
+                'cost' => $data->cost,
+                'currency' => $data->currency,
             );
         }
         if ($merge and $instances = $DB->get_records('enrol', $merge, 'id')) {
@@ -268,7 +281,8 @@ class enrol_robokassa_plugin extends enrol_plugin {
      * @param int $oldinstancestatus
      * @param int $userid
      */
-    public function restore_user_enrolment(restore_enrolments_structure_step $step, $data, $instance, $userid, $oldinstancestatus) {
+    public function restore_user_enrolment(restore_enrolments_structure_step $step, $data, $instance, $userid, $oldinstancestatus)
+    {
         $this->enrol_user($instance, $userid, null, $data->timestart, $data->timeend, $data->status);
     }
 
@@ -277,8 +291,9 @@ class enrol_robokassa_plugin extends enrol_plugin {
      *
      * @return array
      */
-    protected function get_status_options() {
-        $options = array(ENROL_INSTANCE_ENABLED  => get_string('yes'),
+    protected function get_status_options()
+    {
+        $options = array(ENROL_INSTANCE_ENABLED => get_string('yes'),
             ENROL_INSTANCE_DISABLED => get_string('no'));
         return $options;
     }
@@ -290,7 +305,8 @@ class enrol_robokassa_plugin extends enrol_plugin {
      * @param context $context
      * @return array
      */
-    protected function get_roleid_options($instance, $context) {
+    protected function get_roleid_options($instance, $context)
+    {
         if ($instance->id) {
             $roles = get_default_enrol_roles($context, $instance->roleid);
         } else {
@@ -308,7 +324,8 @@ class enrol_robokassa_plugin extends enrol_plugin {
      * @param context $context
      * @return bool
      */
-    public function edit_instance_form($instance, MoodleQuickForm $mform, $context) {
+    public function edit_instance_form($instance, MoodleQuickForm $mform, $context)
+    {
 
         $mform->addElement('text', 'name', get_string('custominstancename', 'enrol'));
         $mform->setType('name', PARAM_TEXT);
@@ -361,7 +378,8 @@ class enrol_robokassa_plugin extends enrol_plugin {
      *         or an empty array if everything is OK.
      * @return void
      */
-    public function edit_instance_validation($data, $files, $instance, $context) {
+    public function edit_instance_validation($data, $files, $instance, $context)
+    {
         $errors = array();
 
         if (!empty($data['enrolenddate']) and $data['enrolenddate'] < $data['enrolstartdate']) {
@@ -399,7 +417,8 @@ class enrol_robokassa_plugin extends enrol_plugin {
      * @param stdClass $instance
      * @return bool
      */
-    public function can_delete_instance($instance) {
+    public function can_delete_instance($instance)
+    {
         $context = context_course::instance($instance->courseid);
         return has_capability('enrol/robokassa:config', $context);
     }
@@ -410,7 +429,8 @@ class enrol_robokassa_plugin extends enrol_plugin {
      * @param stdClass $instance
      * @return bool
      */
-    public function can_hide_show_instance($instance) {
+    public function can_hide_show_instance($instance)
+    {
         $context = context_course::instance($instance->courseid);
         return has_capability('enrol/robokassa:config', $context);
     }
