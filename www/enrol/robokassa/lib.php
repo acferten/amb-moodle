@@ -231,13 +231,9 @@ class enrol_robokassa_plugin extends enrol_plugin
                 // формирование подписи
                 $signature_value =md5("$merchant_login:$cost:$invid:$password_1");
 
-                $returnUrl = $CFG->wwwroot . '/enrol/robokassa/ordersuccess.php';
-
                 include($CFG->dirroot . '/enrol/robokassa/enrol.html');
             }
-
         }
-
         return $OUTPUT->box(ob_get_clean());
     }
 

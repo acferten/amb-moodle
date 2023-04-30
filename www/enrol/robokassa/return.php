@@ -15,15 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Robokassa utility script based on Paypal utility script
+ * Robokassa utility script based on PayPal utility script
  *
  * @package    enrol_robokassa
  * @copyright  2004 onwards Martin Dougiamas (http://dougiamas.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/**
+ * @var $CFG
+ * @var $DB
+ * @var $PAGE
+ * @var $OUTPUT
+ */
 require("../../config.php");
 require_once("$CFG->dirroot/enrol/robokassa/lib.php");
+
 
 $id = required_param('id', PARAM_INT);
 
@@ -31,7 +38,7 @@ if (!$course = $DB->get_record("course", array("id" => $id))) {
     redirect($CFG->wwwroot);
 }
 
-$context = context_course::instance($course->id, MUST_EXIST);
+$context = context_course::instance($course->id);
 $PAGE->set_context($context);
 
 require_login();
