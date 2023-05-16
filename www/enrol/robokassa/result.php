@@ -12,8 +12,8 @@ $record = $DB->get_record('enrol_robokassa', ['orderid' => $orderid]);
 // registration info (password #2)
 $mrh_pass2 = get_config('enrol_robokassa', 'password_2');
 
-//установка текущего времени
-//current date
+// установка текущего времени
+// current date
 $tm = getdate(time() + 9 * 3600);
 $date = "$tm[year]-$tm[mon]-$tm[mday] $tm[hours]:$tm[minutes]:$tm[seconds]";
 
@@ -21,11 +21,12 @@ $date = "$tm[year]-$tm[mon]-$tm[mday] $tm[hours]:$tm[minutes]:$tm[seconds]";
 // read parameters
 $out_summ = $_REQUEST["OutSum"];
 $inv_id = $_REQUEST["InvId"];
+$id = $_REQUEST["shp_id"];
 $crc = $_REQUEST["SignatureValue"];
 
 $crc = strtoupper($crc);
 
-$my_crc = strtoupper(md5("$out_summ:$inv_id:$mrh_pass2"));
+$my_crc = strtoupper(md5("{$out_summ}:{$inv_id}:{$mrh_pass2}:shp_id={$id}"));
 
 // проверка корректности подписи
 // check signature

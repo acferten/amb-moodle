@@ -31,8 +31,7 @@
 require("../../config.php");
 require_once("$CFG->dirroot/enrol/robokassa/lib.php");
 
-
-$id = required_param('id', PARAM_INT);
+$id = required_param('shp_id', PARAM_INT);
 
 if (!$course = $DB->get_record("course", array("id" => $id))) {
     redirect($CFG->wwwroot);

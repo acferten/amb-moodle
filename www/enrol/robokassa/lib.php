@@ -228,8 +228,11 @@ class enrol_robokassa_plugin extends enrol_plugin
                 // номер заказа
                 $invid = (int)(((int)($course->id . $USER->id . time())) / 10000);
 
+                // id курса
+                $id = $course->id;
+
                 // формирование подписи
-                $signature_value =md5("$merchant_login:$cost:$invid:$password_1");
+                $signature_value = md5("{$merchant_login}:{$cost}:{$invid}:{$password_1}:shp_id={$id}");
 
                 include($CFG->dirroot . '/enrol/robokassa/enrol.html');
             }
