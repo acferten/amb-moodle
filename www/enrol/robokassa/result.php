@@ -4,7 +4,13 @@ require_once('../../config.php');
 require_once($CFG->libdir . '/enrollib.php');
 require_once($CFG->libdir . '/filelib.php');
 
+// чтение параметров
+// read parameters
 $inv_id = required_param('InvId', PARAM_ALPHANUMEXT);
+$instanceid = required_param('shp_instanceid', PARAM_ALPHANUMEXT);
+$id = required_param('shp_id', PARAM_ALPHANUMEXT);
+$out_summ = $_REQUEST["OutSum"];
+$crc = $_REQUEST["SignatureValue"];
 
 // регистрационная информация (пароль #2)
 // registration info (password #2)
@@ -15,34 +21,31 @@ $mrh_pass2 = get_config('enrol_robokassa', 'password_2');
 $tm = getdate(time() + 9 * 3600);
 $date = "$tm[year]-$tm[mon]-$tm[mday] $tm[hours]:$tm[minutes]:$tm[seconds]";
 
-// чтение параметров
-// read parameters
-$out_summ = $_REQUEST["OutSum"];
-$id = $_REQUEST["shp_id"];
-$crc = $_REQUEST["SignatureValue"];
-
+// контрольная сумма
 $crc = strtoupper($crc);
 
+// моя контрольная сумма
 $my_crc = strtoupper(md5("{$out_summ}:{$inv_id}:{$mrh_pass2}:shp_id={$id}"));
 
 $data = new stdClass();
 
 $data->userid = $USER->id;
 $data->courseid = $id;
-$data->instanceid = $inv_id;
+$data->instanceid = $instanceid;
+$data->orderid = $inv_id;
 $data->payment_status = "Pending";
 $data->payment_currency = $data->mc_currency;
 $data->timeupdated = time();
 
 $DB->insert_record("enrol_robokassa", $data);
 
-$record = $DB->get_record('enrol_robokassa', ['instanceid' => $inv_id]);
+$record = $DB->get_record('enrol_robokassa', ['orderid' => $inv_id]);
 
 // проверка корректности подписи
 // check signature
 if ($my_crc != $crc) {
-    $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where instanceid=:instanceid",
-        ['payment_status' => "Failed", 'instanceid' => $inv_id]);
+    $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where orderid=:orderid",
+        ['payment_status' => "Failed", 'orderid' => $inv_id]);
     echo "<h2>Payment failed.</h2>";
     exit();
 } else {
@@ -50,11 +53,11 @@ if ($my_crc != $crc) {
     // success
     echo "OK$inv_id\n";
 
-    $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where instanceid=:instanceid",
-        ['payment_status' => "OK$inv_id", 'instanceid' => $inv_id]);
+    $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where orderid=:orderid",
+        ['payment_status' => "OK$inv_id", 'orderid' => $inv_id]);
 
     $plugin_instance = $DB->get_record("enrol",
-        array("courseid" => $record->courseid,
+        array("id" => $record->instanceid,
             "enrol" => "robokassa",
             "status" => 0
         ), "*", MUST_EXIST);
