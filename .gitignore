@@ -1,4 +1,4 @@
 /.env
 .idea
 moodledata
-/www/config.php
+www/config.php

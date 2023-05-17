@@ -25,18 +25,16 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    // Enrol anybody.
-    'enrol/pluginname:enrol' => [
+    'enrol/robokassa:config' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
             'manager' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
         ],
     ],
 
     // Manage enrolments of users.
-    'enrol/pluginname:manage' => [
+    'enrol/robokassa:manage' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
@@ -46,7 +44,7 @@ $capabilities = [
     ],
 
     // Unenrol anybody (including self) - watch out for data loss.
-    'enrol/pluginname:unenrol' => [
+    'enrol/robokassa:unenrol' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [
@@ -56,7 +54,7 @@ $capabilities = [
     ],
 
     // Unenrol self - watch out for data loss.
-    'enrol/pluginname:unenrolself' => [
+    'enrol/robokassa:unenrolself' => [
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => [],
