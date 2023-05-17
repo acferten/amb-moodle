@@ -4,9 +4,7 @@ require_once('../../config.php');
 require_once($CFG->libdir . '/enrollib.php');
 require_once($CFG->libdir . '/filelib.php');
 
-$orderid = required_param('InvId', PARAM_ALPHANUMEXT);
-
-$record = $DB->get_record('enrol_robokassa', ['orderid' => $orderid]);
+$inv_id = required_param('InvId', PARAM_ALPHANUMEXT);
 
 // регистрационная информация (пароль #2)
 // registration info (password #2)
@@ -20,7 +18,6 @@ $date = "$tm[year]-$tm[mon]-$tm[mday] $tm[hours]:$tm[minutes]:$tm[seconds]";
 // чтение параметров
 // read parameters
 $out_summ = $_REQUEST["OutSum"];
-$inv_id = $_REQUEST["InvId"];
 $id = $_REQUEST["shp_id"];
 $crc = $_REQUEST["SignatureValue"];
 
@@ -28,21 +25,36 @@ $crc = strtoupper($crc);
 
 $my_crc = strtoupper(md5("{$out_summ}:{$inv_id}:{$mrh_pass2}:shp_id={$id}"));
 
+$data = new stdClass();
+
+$data->userid = $USER->id;
+$data->courseid = $id;
+$data->instanceid = $inv_id;
+$data->payment_status = "Pending";
+$data->payment_currency = $data->mc_currency;
+$data->timeupdated = time();
+
+$DB->insert_record("enrol_robokassa", $data);
+
+$record = $DB->get_record('enrol_robokassa', ['instanceid' => $inv_id]);
+
 // проверка корректности подписи
 // check signature
 if ($my_crc != $crc) {
-    echo "bad sign\n";
+    $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where instanceid=:instanceid",
+        ['payment_status' => "Failed", 'instanceid' => $inv_id]);
+    echo "<h2>Payment failed.</h2>";
     exit();
 } else {
     // признак успешно проведенной операции
     // success
     echo "OK$inv_id\n";
 
-    $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where ordernumber=:order_number",
-        ['payment_status' => "OK$inv_id", 'order_number' => $inv_id]);
+    $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where instanceid=:instanceid",
+        ['payment_status' => "OK$inv_id", 'instanceid' => $inv_id]);
 
     $plugin_instance = $DB->get_record("enrol",
-        array("id" => $record->instanceid,
+        array("courseid" => $record->courseid,
             "enrol" => "robokassa",
             "status" => 0
         ), "*", MUST_EXIST);
