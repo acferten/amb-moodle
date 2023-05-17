@@ -25,7 +25,7 @@ $date = "$tm[year]-$tm[mon]-$tm[mday] $tm[hours]:$tm[minutes]:$tm[seconds]";
 $crc = strtoupper($crc);
 
 // моя контрольная сумма
-$my_crc = strtoupper(md5("{$out_summ}:{$inv_id}:{$mrh_pass2}:shp_id={$id}"));
+$my_crc = strtoupper(md5("{$out_summ}:{$inv_id}:{$mrh_pass2}:shp_id={$id}:shp_instanceid={$instanceid}"));
 
 $data = new stdClass();
 
@@ -44,6 +44,8 @@ $record = $DB->get_record('enrol_robokassa', ['orderid' => $inv_id]);
 // проверка корректности подписи
 // check signature
 if ($my_crc != $crc) {
+    $DB->insert_record("enrol_robokassa", $data);
+
     $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where orderid=:orderid",
         ['payment_status' => "Failed", 'orderid' => $inv_id]);
     echo "<h2>Payment failed.</h2>";
