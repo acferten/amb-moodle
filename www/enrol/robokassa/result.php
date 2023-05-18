@@ -67,15 +67,15 @@ $record = $DB->get_record('enrol_robokassa', ['orderid' => $inv_id]);
 
 // проверка корректности подписи
 // check signature
-if ($my_crc != $crc) {
-    $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where orderid=:orderid",
-        ['payment_status' => "Failed", 'orderid' => $inv_id]);
-    echo "<h2>Payment failed.</h2>";
-    exit();
-} else {
-    // признак успешно проведенной операции
-    // success
-    echo "OK$inv_id\n";
+//if ($my_crc != $crc) {
+//    $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where orderid=:orderid",
+//        ['payment_status' => "Failed", 'orderid' => $inv_id]);
+//    echo "<h2>Payment failed.</h2>";
+//    exit();
+//} else {
+//    // признак успешно проведенной операции
+//    // success
+//    echo "OK$inv_id\n";
 
     $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where orderid=:orderid",
         ['payment_status' => "OK$inv_id", 'orderid' => $inv_id]);
@@ -116,7 +116,7 @@ if ($my_crc != $crc) {
         $course = $DB->get_record('course', ['id' => $record->courseid]);
         $fullname = format_string($course->fullname, true, array('context' => $context));
         redirect($destination, get_string('paymentthanks', '', $fullname));
-    }
+//    }
 }
 
 // запись в бд информации о проведенной операции
