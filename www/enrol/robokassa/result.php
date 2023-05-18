@@ -68,8 +68,6 @@ $record = $DB->get_record('enrol_robokassa', ['orderid' => $inv_id]);
 // проверка корректности подписи
 // check signature
 if ($my_crc != $crc) {
-    $DB->insert_record("enrol_robokassa", $data);
-
     $DB->execute("update {enrol_robokassa} set payment_status=:payment_status where orderid=:orderid",
         ['payment_status' => "Failed", 'orderid' => $inv_id]);
     echo "<h2>Payment failed.</h2>";
