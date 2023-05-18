@@ -8,24 +8,25 @@ require_once('../../config.php');
 require_once($CFG->libdir . '/enrollib.php');
 require_once($CFG->libdir . '/filelib.php');
 
-$dataobject = new stdClass();
-
-$dataobject->userid = 1;
-$dataobject->courseid = 1;
-$dataobject->instanceid = 1;
-$dataobject->orderid = 123;
-$dataobject->payment_status = "Зашел";
-$dataobject->payment_currency = "RU";
-$dataobject->timeupdated = time();
-
-$DB->insert_record(
-    "enrol_robokassa",
-    $dataobject,
-    $returnid = true,
-    $bulk = false,
-);
-
-die();
+// тестирование того, что робокасса сюда заходит (не заходит)
+//$dataobject = new stdClass();
+//
+//$dataobject->userid = 1;
+//$dataobject->courseid = 1;
+//$dataobject->instanceid = 1;
+//$dataobject->orderid = 123;
+//$dataobject->payment_status = "Зашел";
+//$dataobject->payment_currency = "RU";
+//$dataobject->timeupdated = time();
+//
+//$DB->insert_record(
+//    "enrol_robokassa",
+//    $dataobject,
+//    $returnid = true,
+//    $bulk = false,
+//);
+//
+//die();
 
 // чтение параметров
 // read parameters

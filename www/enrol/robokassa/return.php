@@ -62,5 +62,3 @@ if (is_enrolled($context, null, '', true)) {
     $a->fullname = $fullname;
     notice(get_string('paymentsorry', '', $a), $destination);
 }
-
-
