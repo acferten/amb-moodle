@@ -25,7 +25,7 @@ services:
       - web
     volumes:
       - ./www:/var/www
-      - ./images/proxy:/etc/nginx/conf.d/
+      - ../../../etc/letsenctypt:/etc/letsencrypt
     networks:
       - moodle
 
