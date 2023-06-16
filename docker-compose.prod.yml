@@ -25,7 +25,7 @@ services:
       - web
     volumes:
       - ./www:/var/www
-      - ../../../etc/letsenctypt:/etc/letsencrypt
+      - ../../../etc/letsencrypt:/etc/letsencrypt
     networks:
       - moodle
 
