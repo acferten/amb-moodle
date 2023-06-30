@@ -15,6 +15,7 @@ services:
   proxy:
     build:
       context: images/proxy
+      dockerfile: Dockerfile
     container_name: proxy
     restart: unless-stopped
     ports:
@@ -23,7 +24,7 @@ services:
       - web
     volumes:
       - ./www:/var/www
-      - ./images/proxy:/etc/nginx/conf.d/
+      - ./images/proxy/nginx.conf:/etc/nginx/conf.d/nginx.conf
     networks:
       - moodle
 
