@@ -34,7 +34,9 @@ RUN install-php-extensions \
             xml \
             intl \
             exif \
-            opcache
+            opcache \
+            mysqli \
+            ldap
 
 
 

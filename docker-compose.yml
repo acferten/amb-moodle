@@ -50,6 +50,18 @@ services:
     networks:
       - moodle
 
+  db_test:
+    image: mysql
+    restart: always
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: moodle
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    networks:
+      - moodle
+
 volumes:
   dbdata:
     driver: local
