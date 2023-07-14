@@ -1,32 +1,35 @@
 <?php
-// This file is part of the Contact Form plugin for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
-// Contact Form is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Contact Form is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Contact Form.  If not, see <http://www.gnu.org/licenses/>.
-
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
- * Privacy Subsystem implementation for local_contact.
+ * Privacy provider.
  *
- * @package    local_contact
- * @copyright  2015-2023 TNG Consulting Inc. - www.tngcosulting.ca
- * @author     Michael Milette
+ * @package    report_overviewstats
+ * @copyright  2021 Mikhail Golenkov <mikhailgolenkov@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace report_overviewstats\privacy;
+
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * Privacy Subsystem for local_contact implementing null_provider.
+ * Privacy provider.
  *
- * @copyright  2022 TNG Consulting Inc. <www.tngconsulting.ca>
+ * @package    report_overviewstats
+ * @copyright  2021 Mikhail Golenkov <mikhailgolenkov@catalyst-au.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {
