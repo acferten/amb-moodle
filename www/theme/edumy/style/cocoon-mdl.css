@@ -1265,7 +1265,7 @@ div[class*="block_cocoon_slider"] .ccnBlockControls {
 #ccnSettingsMenuContainer #region-main-settings-menu {
   background: [[setting:color_tertiary]];
   padding: 12px 19px 10px !important;
-  margin: 0 10px 0 0 !important;
+  margin: 0 10px 80px 0 !important;
   border-radius: 3px;
   -webkit-box-shadow: 0 2px 1px rgba(0, 0, 0, .1);
   box-shadow: 0 2px 1px rgba(0, 0, 0, .1);
